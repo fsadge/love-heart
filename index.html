@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>爱心便签动画</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:"微软雅黑",sans-serif;}
+body{
+    width:100vw;height:100vh;
+    overflow:hidden;
+    background:#000;
+}
+.note{
+    position:absolute;
+    width:120px;height:70px;
+    border-radius:6px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:4px;
+    text-align:center;
+    font-size:16px;
+    box-shadow: 0 2px 8px #333;
+}
+</style>
+</head>
+<body>
+<script>
+// 文案
+const tipsHeart = [
+    "好好吃饭", "保持好心情", "我想你了", "别熬夜",
+    "好好爱自己", "多喝温水", "天天开心", "顺顺利利",
+    "照顾好自己", "万事胜意", "平安喜乐", "一切安好",
+    "要开心呀", "别太累了", "记得休息", "岁岁无忧"
+];
+const tipsRandom = [
+    "好久不见", "在干嘛", "我喜欢你", "等你消息",
+    "思念成疾", "我想你了", "想见见你", "别忘记我",
+    "岁岁念你", "万事皆甜", "满眼是你", "满心欢喜",
+    "想和你见面", "念你如常", "温柔予你", "一直想你"
+];
+const colors = ["#ffc0cb","#add8e6","#90ee90","#fffacd","#ff69b4","#87ceeb","#dda0dd","#e6e6fa"];
+
+function randomChoice(arr){
+    return arr[Math.floor(Math.random()*arr.length)];
+}
+//爱心方程
+function heartCurve(t,scale=14){
+    let x = 16 * Math.sin(t)**3;
+    let y = -(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t));
+    return {x:x*scale, y:y*scale};
+}
+
+let noteList = [];
+function createNote(left,top,text){
+    const div = document.createElement('div');
+    div.className="note";
+    div.style.left = left+"px";
+    div.style.top = top+"px";
+    div.style.background = randomChoice(colors);
+    div.innerText = text;
+    document.body.appendChild(div);
+    noteList.push(div);
+}
+function clearAllNotes(){
+    noteList.forEach(el=>el.remove());
+    noteList = [];
+}
+
+async function sleep(ms){
+    return new Promise(res=>setTimeout(res,ms));
+}
+
+async function run(){
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const cx = w/2;
+    const cy = h/2 -60;
+    const numHeart = 80;
+    //阶段1 爱心
+    for(let i=0;i<numHeart;i++){
+        const t = 2*Math.PI*i/numHeart;
+        const p = heartCurve(t,14);
+        createNote(cx+p.x, cy+p.y, randomChoice(tipsHeart));
+        await sleep(40);
+    }
+    await sleep(3000);
+    clearAllNotes();
+    await sleep(500);
+    //阶段2 满屏随机便签
+    const numRandom = 100;
+    for(let i=0;i<numRandom;i++){
+        const rx = Math.floor(Math.random()*(w-140));
+        const ry = Math.floor(Math.random()*(h-90));
+        createNote(rx,ry, randomChoice(tipsRandom));
+        await sleep(30);
+    }
+}
+run();
+</script>
+</body>
+</html>
